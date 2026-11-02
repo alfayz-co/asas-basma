@@ -179,8 +179,8 @@ async function sysNotify(title, body) {
   try {
     if (!('Notification' in window) || Notification.permission !== 'granted') return;
     const reg = await navigator.serviceWorker.getRegistration();
-    if (reg) reg.showNotification(title, { body, icon: 'icon-192.png', badge: 'icon-192.png', lang: 'ar', dir: 'rtl', tag: title + body });
-    else new Notification(title, { body, icon: 'icon-192.png' });
+    if (reg) reg.showNotification(title, { body, icon: 'logo-192.png', badge: 'logo-192.png', lang: 'ar', dir: 'rtl', tag: title + body });
+    else new Notification(title, { body, icon: 'logo-192.png' });
   } catch (e) { }
 }
 function alertBoth(kind, title, body, who) { toast(kind, title, body, who); if (document.hidden || isOwner) sysNotify(title, body); }
@@ -765,6 +765,24 @@ onAuthStateChanged(auth, u => {
 $('logoutBtn').onclick = async () => { closeSheetIfOpen(); await signOut(auth); };
 function closeSheetIfOpen() { if (!$('sheet').hidden) closeSheet(); }
 addEventListener('resize', () => document.querySelectorAll('.tabs').forEach(movePill));
+
+/* ========== light / dark ========== */
+const SUN = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12a4 4 0 1 0 8 0a4 4 0 1 0-8 0M3 12h1M12 3v1M20 12h1M12 20v1M5.6 5.6l.7.7M18.4 5.6l-.7.7M17.7 17.7l.7.7M6.3 17.7l-.7.7"/></svg>';
+const MOON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3h.39a7.5 7.5 0 0 0 7.92 12.45A9 9 0 1 1 12 3z"/></svg>';
+const curTheme = () => document.documentElement.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+function paintThemeBtns() {
+  const t = curTheme();
+  document.querySelectorAll('[data-theme-toggle]').forEach(b => { b.innerHTML = t === 'dark' ? SUN : MOON; b.setAttribute('aria-label', t === 'dark' ? 'التحويل للوضع الأبيض' : 'التحويل للوضع الأسود'); });
+  const m = $('themeColor'); if (m) m.setAttribute('content', t === 'dark' ? '#121110' : '#f3f2ee');
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-theme-toggle]'); if (!b) return;
+  const next = curTheme() === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('basma-theme', next); } catch (err) { }
+  paintThemeBtns(); vibrate(15);
+});
+paintThemeBtns();
 
 /* ========== boot ========== */
 (async () => { try { if (window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()) { window.__bio = true; if (view === 'vEmp' && !busy) renderEmp(); } } catch (e) { } })();

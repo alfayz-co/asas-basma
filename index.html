@@ -3,12 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#121110">
+<meta name="theme-color" content="#121110" id="themeColor">
+<script>try{var t=localStorage.getItem("basma-theme");if(t){document.documentElement.setAttribute("data-theme",t);}}catch(e){}</script>
 <meta name="description" content="نظام الحضور والانصراف لأساس العارض">
 <title>بصمة أساس العارض</title>
-<link rel="manifest" href="manifest.json">
-<link rel="icon" href="icon-192.png">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json?v=6">
+<link rel="icon" type="image/png" sizes="192x192" href="logo-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="logo-180.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -299,6 +300,11 @@ button.day{cursor:pointer}
 }
 
 .chrome-user{display:flex;align-items:center;gap:8px}
+.authcard{position:relative}
+.themecorner{position:absolute;top:14px;left:14px}
+[data-theme-toggle] svg{transition:transform .5s cubic-bezier(.3,1.4,.5,1)}
+[data-theme-toggle]:active svg{transform:rotate(-40deg) scale(.85)}
+body,.card,.okpi,.authcard,.sheet,.toast,.slot,.kpi{transition:background-color .4s ease,border-color .4s ease,color .4s ease}
 .uchip{font-size:13px;color:var(--muted);max-width:40vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .iconbtn{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--surface2);display:flex;align-items:center;justify-content:center}
 .auth{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding-block:30px}
@@ -357,7 +363,7 @@ button.day{cursor:pointer}
 <path d="M1325 1474L1325 731L1461 842L1461 1450L1615 1474L1433 1474L1432 857L1352 791L1352 1474Z"/></g></svg>
         <div><b>أساس العارض</b><span>الحضور والانصراف</span></div>
       </div>
-      <div class="chrome-user"><span class="uchip" id="userChip"></span><button class="iconbtn" id="logoutBtn" aria-label="تسجيل الخروج" title="تسجيل الخروج"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-2M9 12h12l-3-3M18 15l3-3"/></svg></button></div>
+      <div class="chrome-user"><span class="uchip" id="userChip"></span><button class="iconbtn" data-theme-toggle type="button" aria-label="تبديل الوضع الأبيض والأسود" title="الوضع الأبيض / الأسود"></button><button class="iconbtn" id="logoutBtn" aria-label="تسجيل الخروج" title="تسجيل الخروج"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-2M9 12h12l-3-3M18 15l3-3"/></svg></button></div>
     </header>
     <div class="clockbar">
       <div class="t num" id="bigClock">--:--</div>
@@ -367,7 +373,7 @@ button.day{cursor:pointer}
 
   <main id="vLogin" class="view auth" hidden>
     <form class="authcard" id="loginForm" novalidate>
-      <div class="lg"><svg viewBox="300 -12 1330 1500" aria-hidden="true"><g fill="var(--gold)"><path d="M828 786L830 168L1040 2L1041 1200L1012 1153L1015 61L860 185L858 838Z"/>
+      <div class="themecorner"><button class="iconbtn" data-theme-toggle type="button" aria-label="تبديل الوضع الأبيض والأسود" title="الوضع الأبيض / الأسود"></button></div><div class="lg"><svg viewBox="300 -12 1330 1500" aria-hidden="true"><g fill="var(--gold)"><path d="M828 786L830 168L1040 2L1041 1200L1012 1153L1015 61L860 185L858 838Z"/>
 <path d="M1108 1346L1111 315L1256 431L1259 1475L1083 1476L758 847L438 1474L312 1471L396 1450L727 786L784 786L1117 1448L1229 1450L1231 448L1138 375L1137 1395Z"/>
 <path d="M539 1474L763 1027L992 1472L951 1476L765 1122L585 1475Z"/>
 <path d="M1325 1474L1325 731L1461 842L1461 1450L1615 1474L1433 1474L1432 857L1352 791L1352 1474Z"/></g></svg><b>أساس العارض</b><span>تسجيل الدخول</span></div>
@@ -381,7 +387,7 @@ button.day{cursor:pointer}
 
   <main id="vPass" class="view auth" hidden>
     <form class="authcard" id="passForm" novalidate>
-      <div class="lg"><svg viewBox="300 -12 1330 1500" aria-hidden="true"><g fill="var(--gold)"><path d="M828 786L830 168L1040 2L1041 1200L1012 1153L1015 61L860 185L858 838Z"/>
+      <div class="themecorner"><button class="iconbtn" data-theme-toggle type="button" aria-label="تبديل الوضع الأبيض والأسود" title="الوضع الأبيض / الأسود"></button></div><div class="lg"><svg viewBox="300 -12 1330 1500" aria-hidden="true"><g fill="var(--gold)"><path d="M828 786L830 168L1040 2L1041 1200L1012 1153L1015 61L860 185L858 838Z"/>
 <path d="M1108 1346L1111 315L1256 431L1259 1475L1083 1476L758 847L438 1474L312 1471L396 1450L727 786L784 786L1117 1448L1229 1450L1231 448L1138 375L1137 1395Z"/>
 <path d="M539 1474L763 1027L992 1472L951 1476L765 1122L585 1475Z"/>
 <path d="M1325 1474L1325 731L1461 842L1461 1450L1615 1474L1433 1474L1432 857L1352 791L1352 1474Z"/></g></svg><b>أهلاً <span id="psName"></span></b><span>اختر كلمة سر جديدة لحسابك</span></div>

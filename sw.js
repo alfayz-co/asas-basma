@@ -1,14 +1,14 @@
-const CACHE = 'asas-basma-v5';
+const CACHE = 'asas-basma-v6';
 const SHELL = [
   './',
   './index.html',
   './app.js',
   './config.js',
   './manifest.json',
-  './icon-192.png',
-  './icon-512.png',
-  './icon-maskable-512.png',
-  './apple-touch-icon.png'
+  './logo-180.png',
+  './logo-192.png',
+  './logo-512.png',
+  './logo-maskable.png'
 ];
 
 self.addEventListener('install', e => {

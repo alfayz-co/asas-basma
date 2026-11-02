@@ -10,13 +10,12 @@
 | `app.js` | منطق التطبيق والاتصال بـ Firebase |
 | `config.js` | إعدادات مشروع Firebase ورقم المالك |
 | `firestore.rules` | قواعد الحماية، تُلصق في Firebase وليس لها دور على GitHub |
-| `manifest.json` و`sw.js` و`icons/` | التثبيت على الجوال والعمل بدون إنترنت |
+| `manifest.json` و`sw.js` وصور `logo-*.png` | التثبيت على الجوال والعمل بدون إنترنت |
 
 ## الإعداد مرة واحدة
 
-1. **رقم المالك:** افتح `config.js` و`firestore.rules`، وضع الـ UID بتاعك مكان `OWNER_UID_HERE` في الملفين.
-2. **قواعد الحماية:** في Firebase ادخل **Firestore**، ثم تبويب **Rules**. امسح الموجود، والصق محتوى `firestore.rules` كله، ودوس **Publish**.
-3. **الرفع:** ارفع كل الملفات ما عدا `firestore.rules` على GitHub.
+1. **قواعد الحماية:** في Firebase ادخل **Firestore**، ثم تبويب **Rules**. امسح الموجود، والصق محتوى `firestore.rules` كله، ودوس **Publish**.
+2. **الرفع:** ارفع كل الملفات على GitHub في أول الـ Repository، من غير فولدرات.
 
 ## الاستخدام
 
