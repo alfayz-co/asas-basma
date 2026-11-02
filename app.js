@@ -179,8 +179,8 @@ async function sysNotify(title, body) {
   try {
     if (!('Notification' in window) || Notification.permission !== 'granted') return;
     const reg = await navigator.serviceWorker.getRegistration();
-    if (reg) reg.showNotification(title, { body, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png', lang: 'ar', dir: 'rtl', tag: title + body });
-    else new Notification(title, { body, icon: 'icons/icon-192.png' });
+    if (reg) reg.showNotification(title, { body, icon: 'icon-192.png', badge: 'icon-192.png', lang: 'ar', dir: 'rtl', tag: title + body });
+    else new Notification(title, { body, icon: 'icon-192.png' });
   } catch (e) { }
 }
 function alertBoth(kind, title, body, who) { toast(kind, title, body, who); if (document.hidden || isOwner) sysNotify(title, body); }
