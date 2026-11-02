@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#121110">
 <meta name="description" content="نظام الحضور والانصراف لأساس العارض">
+<title>بصمة أساس العارض</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -12,11 +13,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="أساس العارض">
-<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>بصمة أساس العارض</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alexandria:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Cinzel:wght@500&display=swap">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <style>
 /* Layout: one centered app column; employee and owner are two views of the same shell, gold used only for the logo, the ring and the primary action */
 :root{
@@ -297,8 +297,41 @@ button.day{cursor:pointer}
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .lp{fill:var(--gold);stroke-dashoffset:0}
 }
-</style>
 
+.chrome-user{display:flex;align-items:center;gap:8px}
+.uchip{font-size:13px;color:var(--muted);max-width:40vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.iconbtn{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--surface2);display:flex;align-items:center;justify-content:center}
+.auth{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding-block:30px}
+.authcard{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:28px 22px;display:flex;flex-direction:column;gap:14px;animation:up .6s cubic-bezier(.2,.9,.3,1) both}
+.authcard .lg{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:6px}
+.authcard .lg svg{width:84px;height:auto}
+.authcard .lg b{font-family:var(--f-display);font-weight:600;font-size:20px}
+.authcard .lg span{color:var(--muted);font-size:13px}
+.fl{display:flex;flex-direction:column;gap:5px;flex:1;min-width:150px}
+.fl label{font-size:12px;color:var(--muted)}
+.fl input,.authcard input{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:11px 13px;font:inherit;color:var(--fg);transition:border-color .2s}
+.fl input:focus,.authcard input:focus{border-color:var(--gold);outline:none}
+.authcard .btn{flex:0 0 auto;width:100%;padding:13px}
+.authcard .err{text-align:center}
+.authcard .note{font-size:12px;color:var(--muted);text-align:center;line-height:1.7}
+.addform{margin-top:16px;padding-top:16px;border-top:1px solid var(--line);align-items:flex-end}
+.addform .btn{flex:0 0 auto}
+.empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:22px 10px;color:var(--muted)}
+.empty svg{color:var(--gold)}
+.empty b{color:var(--fg);font-family:var(--f-display);font-weight:500}
+.empty span{font-size:13px;max-width:34ch}
+.av img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.av{overflow:hidden}
+.photos{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.photos figure{margin:0;text-align:center}
+.photos img{width:64px;height:64px;border-radius:12px;object-fit:cover;display:block;animation:dayin .4s ease both}
+.photos figcaption{font-size:10px;color:var(--muted);margin-top:3px}
+.devline{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px}
+.c-inactive{background:var(--surface2);color:var(--muted)}
+.msgbox{text-align:center;padding:60px 10px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.msgbox b{font-family:var(--f-display);font-weight:500;font-size:18px}
+.loader{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--gold);animation:spin 1s linear infinite}
+</style>
 </head>
 <body>
 <div class="splash" id="splash" aria-hidden="true">
@@ -315,612 +348,59 @@ button.day{cursor:pointer}
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
 <div class="app">
-  <header class="top">
-    <div class="brand">
-      <svg viewBox="300 -12 1330 1500" aria-hidden="true"><g fill="var(--gold)">
-        <path d="M828 786L830 168L1040 2L1041 1200L1012 1153L1015 61L860 185L858 838Z"/>
-        <path d="M1108 1346L1111 315L1256 431L1259 1475L1083 1476L758 847L438 1474L312 1471L396 1450L727 786L784 786L1117 1448L1229 1450L1231 448L1138 375L1137 1395Z"/>
-        <path d="M539 1474L763 1027L992 1472L951 1476L765 1122L585 1475Z"/>
-        <path d="M1325 1474L1325 731L1461 842L1461 1450L1615 1474L1433 1474L1432 857L1352 791L1352 1474Z"/>
-      </g></svg>
-      <div><b>أساس العارض</b><span>الحضور والانصراف <em class="demo-tag" style="font-style:normal">نسخة تجريبية</em></span></div>
+  <div id="chrome" hidden>
+    <header class="top">
+      <div class="brand">
+        <svg viewBox="300 -12 1330 1500" aria-hidden="true"><g fill="var(--gold)"><path d="M828 786L830 168L1040 2L1041 1200L1012 1153L1015 61L860 185L858 838Z"/>
+<path d="M1108 1346L1111 315L1256 431L1259 1475L1083 1476L758 847L438 1474L312 1471L396 1450L727 786L784 786L1117 1448L1229 1450L1231 448L1138 375L1137 1395Z"/>
+<path d="M539 1474L763 1027L992 1472L951 1476L765 1122L585 1475Z"/>
+<path d="M1325 1474L1325 731L1461 842L1461 1450L1615 1474L1433 1474L1432 857L1352 791L1352 1474Z"/></g></svg>
+        <div><b>أساس العارض</b><span>الحضور والانصراف</span></div>
+      </div>
+      <div class="chrome-user"><span class="uchip" id="userChip"></span><button class="iconbtn" id="logoutBtn" aria-label="تسجيل الخروج" title="تسجيل الخروج"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-2M9 12h12l-3-3M18 15l3-3"/></svg></button></div>
+    </header>
+    <div class="clockbar">
+      <div class="t num" id="bigClock">--:--</div>
+      <div class="d"><div id="gDate"></div><div id="hDate"></div></div>
     </div>
-    <div class="seg" id="roleSeg" role="group" aria-label="العرض">
-      <span class="pill"></span>
-      <button id="r-emp" aria-pressed="true">الموظف</button>
-      <button id="r-own" aria-pressed="false">المالك</button>
-    </div>
-  </header>
-
-  <div class="clockbar">
-    <div class="t num" id="bigClock">--:--</div>
-    <div class="d"><div id="gDate"></div><div id="hDate"></div></div>
   </div>
 
-  <main id="vEmp" class="view"></main>
-  <main id="vOwn" class="view" hidden></main>
+  <main id="vLogin" class="view auth" hidden>
+    <form class="authcard" id="loginForm" novalidate>
+      <div class="lg"><svg viewBox="300 -12 1330 1500" aria-hidden="true"><g fill="var(--gold)"><path d="M828 786L830 168L1040 2L1041 1200L1012 1153L1015 61L860 185L858 838Z"/>
+<path d="M1108 1346L1111 315L1256 431L1259 1475L1083 1476L758 847L438 1474L312 1471L396 1450L727 786L784 786L1117 1448L1229 1450L1231 448L1138 375L1137 1395Z"/>
+<path d="M539 1474L763 1027L992 1472L951 1476L765 1122L585 1475Z"/>
+<path d="M1325 1474L1325 731L1461 842L1461 1450L1615 1474L1433 1474L1432 857L1352 791L1352 1474Z"/></g></svg><b>أساس العارض</b><span>تسجيل الدخول</span></div>
+      <div class="fl"><label for="lgUser">الرقم الوظيفي</label><input id="lgUser" autocomplete="username" placeholder="1001" dir="ltr"></div>
+      <div class="fl"><label for="lgPass">كلمة السر</label><input id="lgPass" type="password" autocomplete="current-password" dir="ltr"></div>
+      <button class="btn primary" id="lgBtn" type="submit">دخول</button>
+      <div class="err" id="lgErr" role="alert"></div>
+      <p class="note">المالك يدخل بالإيميل بدل الرقم الوظيفي.<br>نسيت كلمة السر؟ تواصل مع المالك.</p>
+    </form>
+  </main>
 
-  <p class="foot">بيانات الموظفين النموذجية للعرض · تسجيلاتك محفوظة على هذا الجهاز</p>
+  <main id="vPass" class="view auth" hidden>
+    <form class="authcard" id="passForm" novalidate>
+      <div class="lg"><svg viewBox="300 -12 1330 1500" aria-hidden="true"><g fill="var(--gold)"><path d="M828 786L830 168L1040 2L1041 1200L1012 1153L1015 61L860 185L858 838Z"/>
+<path d="M1108 1346L1111 315L1256 431L1259 1475L1083 1476L758 847L438 1474L312 1471L396 1450L727 786L784 786L1117 1448L1229 1450L1231 448L1138 375L1137 1395Z"/>
+<path d="M539 1474L763 1027L992 1472L951 1476L765 1122L585 1475Z"/>
+<path d="M1325 1474L1325 731L1461 842L1461 1450L1615 1474L1433 1474L1432 857L1352 791L1352 1474Z"/></g></svg><b>أهلاً <span id="psName"></span></b><span>اختر كلمة سر جديدة لحسابك</span></div>
+      <div class="fl"><label for="psNew">كلمة السر الجديدة</label><input id="psNew" type="password" autocomplete="new-password" dir="ltr"></div>
+      <div class="fl"><label for="psNew2">تأكيد كلمة السر</label><input id="psNew2" type="password" autocomplete="new-password" dir="ltr"></div>
+      <button class="btn primary" id="psBtn" type="submit">حفظ والمتابعة</button>
+      <div class="err" id="psErr" role="alert"></div>
+    </form>
+  </main>
+
+  <main id="vMsg" class="view" hidden><div class="msgbox"><div class="loader"></div><b id="msgTitle"></b><span class="muted" id="msgBody"></span></div></main>
+  <main id="vEmp" class="view" hidden></main>
+  <main id="vOwn" class="view" hidden></main>
 </div>
 
 <div class="scrim" id="scrim" hidden></div>
 <div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-label="سجل الموظف"><div class="grab"></div><div class="inner" id="sheetInner"></div></div>
 <input type="file" id="cam" accept="image/*" capture="user" hidden>
 
-<script>
-const S={in:540,b1:720,b2:960,out:1260,grace:15};
-const W={in:[510,719],out1:[720,780],in2:[930,1259],out:[1260,1439]};
-const FIELDS=['in','out1','in2','out'];
-const FL={in:'الحضور',out1:'خروج البريك',in2:'العودة',out:'الانصراف'};
-const ACT={in:'تسجيل حضور',out1:'خروج للبريك',in2:'عودة من البريك',out:'تسجيل انصراف'};
-const STL={present:'حاضر',late:'متأخر',half:'نصف يوم',absent:'غائب',missing:'لم يسجّل',pending:'بانتظار الحضور',off:'إجازة',future:'',none:'',break:'في البريك',done:'انصرف'};
-const I={
- check:"M5 12l5 5L20 7",
- face:"M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M9 10h.01M15 10h.01M9.5 15a3.5 3.5 0 0 0 5 0",
- finger:"M18.9 7a8 8 0 0 1 1.1 5v1a6 6 0 0 0 .8 3M8 11a4 4 0 0 1 8 0v1a10 10 0 0 0 2 6M12 11v2a14 14 0 0 0 2.5 8M8 15a18 18 0 0 0 1.8 6M4.9 19a22 22 0 0 1-.9-7v-1a8 8 0 0 1 12-6.95",
- bell:"M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3H4a4 4 0 0 0 2-3v-3a7 7 0 0 1 4-6M9 17v1a3 3 0 0 0 6 0v-1",
- clock:"M12 7v5l3 3M3 12a9 9 0 1 0 18 0a9 9 0 0 0-18 0",
- coffee:"M3 10h14v5a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6zM16.75 12a2.5 2.5 0 0 1 0 5M8 3a2.4 2.4 0 0 0-1 2a2.4 2.4 0 0 0 1 2M12 3a2.4 2.4 0 0 0-1 2a2.4 2.4 0 0 0 1 2",
- login:"M15 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-2M21 12H8l3-3M11 15l-3-3",
- logout:"M14 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-2M9 12h12l-3-3M18 15l3-3",
- alert:"M12 9v4M12 16h.01M3 12a9 9 0 1 0 18 0a9 9 0 0 0-18 0",
- userplus:"M8 7a4 4 0 1 0 8 0a4 4 0 0 0-8 0M16 19h6M19 16v6M6 21v-2a4 4 0 0 1 4-4h4",
- x:"M18 6L6 18M6 6l12 12",
- right:"M9 6l6 6-6 6",left:"M15 6l-6 6 6 6",
- camera:"M5 7h1a2 2 0 0 0 2-2a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2M9 13a3 3 0 1 0 6 0a3 3 0 0 0-6 0",
- play:"M7 4v16l13-8z"
-};
-const ic=(n,s=20,w=1.8)=>`<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${I[n]}"/></svg>`;
-const MI={face:['face','الوجه'],finger:['finger','البصمة']};
-const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-const nf=new Intl.NumberFormat('ar-SA'),nf2=new Intl.NumberFormat('ar-SA',{minimumIntegerDigits:2});
-const ar=n=>nf.format(n);
-const tm=m=>{if(m==null)return '—';m=Math.floor(m);const h=Math.floor(m/60),mm=m%60;return ar(h%12||12)+':'+nf2.format(mm)+' '+(h<12?'ص':'م')};
-const dur=m=>{m=Math.max(0,Math.round(m));const h=Math.floor(m/60),x=m%60;return h?ar(h)+' س '+ar(x)+' د':ar(x)+' د'};
-const pad=n=>String(n).padStart(2,'0');
-const keyOf=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
-const fromKey=k=>{const[y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d)};
-const today0=()=>{const d=new Date();d.setHours(0,0,0,0);return d};
-const nowMin=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()+d.getSeconds()/60};
-const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
-const gFmt=new Intl.DateTimeFormat('ar-SA-u-ca-gregory-nu-arab',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-const hFmt=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura-nu-arab',{day:'numeric',month:'long',year:'numeric'});
-const mFmt=new Intl.DateTimeFormat('ar-SA-u-ca-gregory-nu-arab',{month:'long',year:'numeric'});
-const msFmt=new Intl.DateTimeFormat('ar-SA-u-ca-gregory-nu-arab',{month:'short'});
-const hmFmt=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura-nu-arab',{month:'long',year:'numeric'});
-const dFmt=new Intl.DateTimeFormat('ar-SA-u-ca-gregory-nu-arab',{weekday:'long',day:'numeric',month:'long'});
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const initials=n=>n.trim().split(/\s+/).slice(0,2).map(w=>w[0]).join(' ');
-
-function h32(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
-function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-
-const SAMPLE=[
- {id:'e0',name:'موظف تجريبي',start:'2026-01-01',abs:.04,late:.08},
- {id:'e1',name:'أحمد محمد',start:'2026-01-01',abs:.03,late:.06},
- {id:'e2',name:'سارة علي',start:'2026-01-01',abs:.02,late:.04},
- {id:'e3',name:'خالد عمر',start:'2026-01-01',abs:.09,late:.14},
- {id:'e4',name:'سعيد حسن',start:'2026-01-01',abs:.05,late:.2},
- {id:'e5',name:'منى يوسف',start:'2026-01-01',abs:.02,late:.03}
-];
-const LS='asas-basma-v1';
-let store={emps:[],rec:{},events:[],sel:'e0'};
-try{const s=JSON.parse(localStorage.getItem(LS)||'null');if(s&&s.rec)store=Object.assign(store,s)}catch(e){}
-function save(){try{localStorage.setItem(LS,JSON.stringify(store))}catch(e){}}
-const emps=()=>SAMPLE.concat(store.emps);
-const empById=id=>emps().find(e=>e.id===id)||SAMPLE[0];
-
-const gcache=new Map();
-function gen(emp,key){
-  if(emp.added) return null;
-  const ck=emp.id+key;if(gcache.has(ck)&&key!==keyOf(today0()))return gcache.get(ck);
-  const d=fromKey(key),t=today0();let rec=null;
-  if(d.getDay()!==5&&key>=emp.start&&d<=t){
-    const isT=+d===+t;
-    if(!(isT&&(emp.id==='e0'||emp.id==='e3'))){
-      const r=rng(h32(ck));
-      if(r()>=emp.abs){
-        rec={};
-        rec.in=r()<emp.late?556+Math.floor(r()*40):528+Math.floor(r()*26);
-        if(isT&&emp.id==='e4')rec.in=585;
-        const half=r()<.02;
-        rec.out1=720+Math.floor(r()*7);
-        if(!half){rec.in2=r()<emp.late*.6?977+Math.floor(r()*25):950+Math.floor(r()*14);rec.out=1260+Math.floor(r()*18)}
-        rec.m={in:r()<.6?'face':'finger',out1:'finger',in2:r()<.5?'face':'finger',out:'finger'};
-        if(isT){const n=nowMin();for(const f of FIELDS)if(rec[f]!=null&&rec[f]>n)delete rec[f];if(rec.in==null)rec=null}
-      }
-    }
-  }
-  gcache.set(ck,rec);return rec;
-}
-function getRec(emp,key){const o=store.rec[emp.id]&&store.rec[emp.id][key];return o!==undefined?o:gen(emp,key)}
-function isToday(key){return key===keyOf(today0())}
-
-function status(emp,key){
-  const d=fromKey(key),t=today0();
-  if(key<emp.start)return 'none';
-  if(d>t)return 'future';
-  if(d.getDay()===5)return 'off';
-  const r=getRec(emp,key),isT=isToday(key),n=nowMin();
-  if(!r||r.in==null){if(isT)return n>S.in+S.grace?'missing':'pending';return 'absent'}
-  const late=r.in>S.in+S.grace||(r.in2!=null&&r.in2>S.b2+S.grace);
-  if(!isT&&r.in2==null)return 'half';
-  return late?'late':'present';
-}
-function liveStatus(emp){
-  const key=keyOf(today0()),st=status(emp,key);
-  if(st==='off'||st==='missing'||st==='pending')return st;
-  const r=getRec(emp,key);
-  if(r.out!=null)return 'done';
-  if(r.out1!=null&&r.in2==null)return 'break';
-  return st;
-}
-function worked(r,key){
-  if(!r||r.in==null)return 0;const isT=isToday(key),n=nowMin();
-  const a=(r.out1!=null?r.out1:(isT?Math.min(n,S.b1):S.b1))-r.in;
-  let b=0;if(r.in2!=null)b=(r.out!=null?r.out:(isT?Math.min(n,S.out):S.out))-r.in2;
-  return Math.max(0,a)+Math.max(0,b);
-}
-function nextField(r){if(!r)return 'in';for(const f of FIELDS)if(r[f]==null)return f;return null}
-function nextTxt(r,n){for(const f of FIELDS){if(W[f][0]>n&&!(r&&r[f]!=null))return FL[f]+' يفتح الساعة '+tm(W[f][0])}return ''}
-function allowed(r,n){
-  n=Math.floor(n);const nx=nextTxt(r,n);
-  for(const f of FIELDS){
-    if(n<W[f][0]||n>W[f][1])continue;
-    if(r&&r[f]!=null)return {f:null,msg:'تم '+FL[f]+' الساعة '+tm(r[f]),sub:'لا يمكن تسجيل '+FL[f]+' مرة أخرى'+(nx?' · '+nx:'')};
-    if(f==='out1'&&!(r&&r.in!=null))return {f:null,msg:'لا يوجد حضور مسجّل اليوم',sub:'خروج البريك يحتاج حضوراً مسجّلاً'+(nx?' · '+nx:'')};
-    if(f==='out'&&!(r&&(r.in!=null||r.in2!=null)))return {f:null,msg:'لا يوجد حضور مسجّل اليوم',sub:'لا يمكن الانصراف بدون حضور'};
-    return {f};
-  }
-  return {f:null,msg:'التسجيل مغلق الآن',sub:nx||'انتهت أوقات التسجيل لليوم'};
-}
-function stats(emp,from,to){
-  const t=today0(),end=to<t?to:t;const o={att:0,abs:0,late:0,half:0,hrs:0,days:0};
-  for(let d=new Date(from);d<=end;d=addDays(d,1)){
-    const k=keyOf(d),s=status(emp,k);
-    if(s==='present'||s==='late'||s==='half'){o.att++;o.hrs+=worked(getRec(emp,k),k)}
-    if(s==='late')o.late++;if(s==='half')o.half++;
-    if(s==='absent'||s==='missing')o.abs++;
-    if(['present','late','half','absent','missing'].includes(s))o.days++;
-  }
-  o.pct=o.days?Math.round(o.att/o.days*100):0;o.hrs=Math.round(o.hrs/60);return o;
-}
-function periodRange(p){
-  const t=today0();
-  if(p==='week'){const s=addDays(t,-t.getDay());return [s,addDays(s,6),'الأسبوع الحالي · من '+dFmt.format(s)]}
-  if(p==='month'){return [new Date(t.getFullYear(),t.getMonth(),1),new Date(t.getFullYear(),t.getMonth()+1,0),mFmt.format(t)+' · '+hmFmt.format(t)]}
-  return [new Date(t.getFullYear(),0,1),new Date(t.getFullYear(),11,31),'سنة '+ar(t.getFullYear()).replace(/٬/g,'')+' حتى اليوم']
-}
-
-/* animation helpers */
-function countTo(el,to,fmt=ar,dur0=900){
-  if(!el)return;const from=+(el.dataset.v||0);el.dataset.v=to;
-  if(RM){el.textContent=fmt(to);return}
-  const s=performance.now();
-  (function f(t){const k=Math.min((t-s)/dur0,1),e=1-Math.pow(1-k,3);el.textContent=fmt(Math.round(from+(to-from)*e));if(k<1)requestAnimationFrame(f)})(s);
-}
-function movePill(seg){const p=seg.querySelector('.pill'),b=seg.querySelector('[aria-pressed="true"]');if(!p||!b)return;p.style.width=b.offsetWidth+'px';p.style.left=b.offsetLeft+'px'}
-function vibrate(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
-
-/* toasts + feed */
-function toast(kind,title,body,who){
-  const box=document.getElementById('toasts');const el=document.createElement('div');el.className='toast';
-  const icn={ok:'check',bad:'alert',warn:'bell',info:'coffee',gold:'bell'}[kind]||'bell';
-  el.innerHTML=`<div class="ico i-${kind}">${ic(icn,18)}</div><div class="tx"><small>أساس العارض · ${esc(who||'الآن')}</small><b>${esc(title)}</b>${body?esc(body):''}</div>`;
-  box.prepend(el);vibrate(kind==='bad'?[60,40,60]:40);
-  while(box.children.length>3)box.lastChild.remove();
-  setTimeout(()=>{el.classList.add('leave');setTimeout(()=>el.remove(),400)},5200);
-}
-function pushEvent(e){store.events.unshift(Object.assign({at:Date.now(),day:keyOf(today0())},e));store.events=store.events.slice(0,60);save();if(role==='own')renderFeed(true)}
-
-/* clock */
-function tickClock(){
-  const d=new Date();
-  document.getElementById('bigClock').textContent=d.toLocaleTimeString('ar-SA',{hour:'numeric',minute:'2-digit',second:'2-digit'});
-}
-function setDates(){const d=new Date();document.getElementById('gDate').textContent=gFmt.format(d);document.getElementById('hDate').textContent=hFmt.format(d)+' هـ'}
-
-/* shift band */
-function bandHTML(){
-  const pos=v=>((v-S.in)/(S.out-S.in)*100);
-  return `<div class="band"><div class="now" data-now><span></span></div>
-   <div class="bar"><div class="w1" style="flex:3">الفترة الأولى</div><div class="bk" style="flex:4">${ic('coffee',14)} بريك</div><div class="w2" style="flex:5">الفترة الثانية</div></div>
-   <div class="ticks"><span style="right:0;transform:none">${tm(S.in)}</span><span style="right:${pos(S.b1)}%">${tm(S.b1)}</span><span style="right:${pos(S.b2)}%">${tm(S.b2)}</span><span style="right:auto;left:0;transform:none">${tm(S.out)}</span></div></div>`;
-}
-function updateBands(){
-  const n=nowMin(),p=Math.min(Math.max((n-S.in)/(S.out-S.in),0),1)*100;
-  document.querySelectorAll('[data-now]').forEach(el=>{el.style.right=p+'%';el.querySelector('span').textContent='الآن '+tm(n)});
-}
-
-/* profile (stats + calendar + year) */
-function mountProfile(root,emp){
-  const t=today0();const st={p:'month',y:t.getFullYear(),m:t.getMonth(),sel:null};
-  root.innerHTML=`
-   <div class="tabs" role="group" aria-label="الفترة"><span class="pill"></span>
-    <button data-p="week" aria-pressed="false">أسبوع</button><button data-p="month" aria-pressed="true">شهر</button><button data-p="year" aria-pressed="false">سنة</button></div>
-   <div class="statrow">
-    <div class="donut"><svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="50"/><circle class="fg" cx="60" cy="60" r="50" pathLength="100"/></svg>
-     <div class="c"><b class="num" data-k="pct">٠٪</b><span>الالتزام</span></div></div>
-    <div class="kpis">
-     <div class="kpi"><div class="l"><i style="background:var(--ok)"></i>أيام الحضور</div><b class="num" data-k="att">٠</b></div>
-     <div class="kpi"><div class="l"><i style="background:var(--bad)"></i>أيام الغياب</div><b class="num" data-k="abs">٠</b></div>
-     <div class="kpi"><div class="l"><i style="background:var(--warn)"></i>مرات التأخير</div><b class="num" data-k="late">٠</b></div>
-     <div class="kpi"><div class="l">${ic('clock',13)}ساعات العمل</div><b class="num" data-k="hrs">٠</b></div>
-    </div></div>
-   <div class="period" data-k="per"></div>
-   <div class="calhead"><button class="navb" data-nav="1" aria-label="الشهر السابق">${ic('right',16)}</button>
-     <div style="text-align:center"><b data-k="mon"></b><span class="hj" data-k="hmon"></span></div>
-     <button class="navb" data-nav="-1" aria-label="الشهر التالي">${ic('left',16)}</button></div>
-   <div class="cal" data-k="cal"></div>
-   <div class="legend"><span><i style="background:var(--ok)"></i>حضور</span><span><i style="background:var(--warn)"></i>تأخير</span><span><i style="background:var(--half)"></i>نصف يوم</span><span><i style="background:var(--bad)"></i>غياب</span><span><i style="border:1px dashed var(--muted)"></i>إجازة</span></div>
-   <div class="daydetail" data-k="det"><span class="muted">اضغط على أي يوم لعرض أوقات البصمة</span></div>
-   <div class="calhead" style="margin-top:22px"><b>الالتزام خلال السنة</b><span class="muted small">نسبة الحضور لكل شهر</span></div>
-   <div class="yearbars" data-k="year"></div>`;
-  const $=k=>root.querySelector(`[data-k="${k}"]`);
-  const tabs=root.querySelector('.tabs');
-  function renderStats(){
-    const [a,b,label]=periodRange(st.p),o=stats(emp,a,b);
-    countTo($('att'),o.att);countTo($('abs'),o.abs);countTo($('late'),o.late);countTo($('hrs'),o.hrs);
-    countTo($('pct'),o.pct,v=>ar(v)+'٪');
-    const fg=root.querySelector('.donut .fg');fg.style.stroke=o.pct>=90?'var(--ok)':o.pct>=75?'var(--warn)':'var(--bad)';
-    fg.style.strokeDashoffset=100;requestAnimationFrame(()=>requestAnimationFrame(()=>fg.style.strokeDashoffset=100-o.pct));
-    $('per').textContent=label+(o.half?' · نصف يوم: '+ar(o.half):'');
-    movePill(tabs);
-  }
-  function renderCal(){
-    const first=new Date(st.y,st.m,1),last=new Date(st.y,st.m+1,0);
-    $('mon').textContent=mFmt.format(first);
-    $('hmon').textContent=hmFmt.format(first)===hmFmt.format(last)?hmFmt.format(first):hmFmt.format(first).split(' ')[0]+' – '+hmFmt.format(last);
-    let h=['ح','ن','ث','ر','خ','ج','س'].map(x=>`<span class="wd">${x}</span>`).join('');
-    for(let i=0;i<first.getDay();i++)h+='<span></span>';
-    let k=0;
-    for(let d=1;d<=last.getDate();d++){
-      const dt=new Date(st.y,st.m,d),key=keyOf(dt),s=status(emp,key);
-      const cls='day '+s+(isToday(key)?' today':'')+(st.sel===key?' sel':'');
-      const tip=STL[s]?`${dFmt.format(dt)} · ${STL[s]}`:dFmt.format(dt);
-      h+=`<button class="${cls}" data-day="${key}" aria-label="${tip}" style="animation-delay:${RM?0:k++*22}ms">${ar(d)}</button>`;
-    }
-    $('cal').innerHTML=h;
-    root.querySelector('[data-nav="1"]').disabled=(st.y===2026&&st.m===0)||(emp.start>keyOf(new Date(st.y,st.m,0)));
-    root.querySelector('[data-nav="-1"]').disabled=st.y===t.getFullYear()&&st.m===t.getMonth();
-  }
-  function renderDet(){
-    if(!st.sel)return;const s=status(emp,st.sel),r=getRec(emp,st.sel),d=fromKey(st.sel);
-    let h=`<b>${dFmt.format(d)}</b> · <span class="chip c-${s}">${STL[s]||'—'}</span>`;
-    if(r&&r.in!=null){h+=`<div class="muted small" style="margin-top:4px">`+FIELDS.map(f=>`${FL[f]} ${tm(r[f])}`).join(' · ')+` · صافي ${dur(worked(r,st.sel))}</div>`}
-    else if(s==='off')h+=`<div class="muted small">يوم الجمعة إجازة أسبوعية</div>`;
-    else if(s==='absent')h+=`<div class="muted small">لا توجد بصمة في هذا اليوم</div>`;
-    $('det').innerHTML=h;
-  }
-  function renderYear(){
-    const y=t.getFullYear();let h='';
-    for(let m=0;m<12;m++){
-      const a=new Date(y,m,1),b=new Date(y,m+1,0);
-      const fut=a>t||b<fromKey(emp.start);const o=fut?null:stats(emp,a,b);
-      const pct=o&&o.days?o.pct:0;const hh=fut||!o.days?6:Math.max(6,pct);
-      const c=fut||!o.days?'empty':pct>=90?'':pct>=75?'mid':'low';
-      h+=`<div class="yb" title="${msFmt.format(a)}"><em>${o&&o.days?ar(pct)+'٪':''}</em><div class="b ${c}" style="height:${hh}%;animation-delay:${RM?0:m*60}ms"></div><span>${msFmt.format(a)}</span></div>`;
-    }
-    $('year').innerHTML=h;
-  }
-  root.onclick=e=>{
-    const pb=e.target.closest('[data-p]');
-    if(pb){tabs.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b===pb));st.p=pb.dataset.p;renderStats();return}
-    const nb=e.target.closest('[data-nav]');
-    if(nb&&!nb.disabled){const dlt=-(+nb.dataset.nav);const d=new Date(st.y,st.m+dlt,1);st.y=d.getFullYear();st.m=d.getMonth();renderCal();return}
-    const db=e.target.closest('[data-day]');
-    if(db){st.sel=db.dataset.day;root.querySelectorAll('.day.sel').forEach(x=>x.classList.remove('sel'));db.classList.add('sel');renderDet()}
-  };
-  renderStats();renderCal();renderYear();
-  root._refresh=()=>{renderStats();renderCal();renderDet();};
-}
-
-/* ===== employee view ===== */
-let role='emp',busy=false;
-function renderEmp(){
-  const v=document.getElementById('vEmp');const emp=empById(store.sel);
-  v.innerHTML=`<div class="grid two">
-   <section class="card reveal">
-    <div class="who"><label for="empSel" class="muted small">تسجيل الدخول كـ</label>
-     <select id="empSel">${emps().map(e=>`<option value="${e.id}"${e.id===emp.id?' selected':''}>${esc(e.name)}</option>`).join('')}</select></div>
-    <div class="greet" id="greet"></div>
-    <div class="phase" id="phase"></div>
-    ${bandHTML()}
-    <div class="stage" style="margin-top:22px">
-     <div class="scan" id="scan">
-      <svg class="ring" viewBox="0 0 208 208"><circle class="track" cx="104" cy="104" r="98"/><circle class="orbit" cx="104" cy="104" r="98" pathLength="100"/><circle class="prog" id="prog" cx="104" cy="104" r="98" pathLength="100"/></svg>
-      <div class="core" id="core"><span class="face">${ic('face',70,1.2)}</span></div>
-      <div class="laser"></div>
-      <div class="tick"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path pathLength="30" d="M5 12l5 5L20 7"/></svg></div>
-     </div>
-     <div class="next-label" id="nextLbl"></div>
-     <div class="hint" id="hint"></div>
-     <div class="actions">
-      <button class="btn primary" id="bFace">${ic('camera',18)} بصمة الوجه</button>
-      <button class="btn ghost fp" id="bFp"><span class="fill"></span>${ic('finger',18)}<span>${window.__bio?'بصمة الجهاز':'اضغط مطوّلاً'}</span></button>
-     </div>
-     <div class="slots" id="slots"></div>
-     <div class="timer"><span class="muted small">مدة العمل اليوم</span><b class="num" id="wt">٠٠:٠٠:٠٠</b></div>
-    </div>
-   </section>
-   <section class="card reveal" style="animation-delay:.12s">
-    <h2>سجلّي <span class="muted small" style="font-family:var(--f-body)">${esc(emp.name)}</span></h2>
-    <div id="myProf"></div>
-   </section></div>`;
-  document.getElementById('empSel').onchange=e=>{store.sel=e.target.value;save();renderEmp()};
-  mountProfile(document.getElementById('myProf'),emp);
-  bindScan();updateEmpLive(true);updateBands();
-}
-function todayRec(emp){return getRec(emp,keyOf(today0()))}
-function updateEmpLive(full){
-  const emp=empById(store.sel),r=todayRec(emp),n=nowMin(),key=keyOf(today0());
-  const hr=new Date().getHours();
-  const g=document.getElementById('greet');if(!g)return;
-  g.textContent=(hr<12?'صباح الخير':'مساء الخير')+'، '+emp.name.split(' ')[0];
-  const nf0=nextField(r),off=fromKey(key).getDay()===5;
-  let txt,col;
-  const left=x=>dur(x-n);
-  if(off){txt='اليوم إجازة أسبوعية';col='var(--muted)'}
-  else if(!r||r.in==null){if(n<S.in){txt='الدوام يبدأ بعد '+left(S.in);col='var(--muted)'}else{txt='متأخر عن الحضور منذ '+dur(n-S.in);col='var(--bad)'}}
-  else if(r.out1==null){txt='أنت في الفترة الأولى · البريك بعد '+left(S.b1);col='var(--ok)';if(n>=S.b1){txt='حان وقت البريك';col='var(--warn)'}}
-  else if(r.in2==null){if(n<S.b2){txt='أنت في البريك · العودة بعد '+left(S.b2);col='var(--info)'}else{txt='متأخر عن العودة منذ '+dur(n-S.b2);col='var(--bad)'}}
-  else if(r.out==null){txt=n<S.out?'الفترة الثانية · الانصراف بعد '+left(S.out):'انتهى وقت الدوام · سجّل انصرافك';col=n<S.out?'var(--ok)':'var(--warn)'}
-  else{txt='انتهى دوامك · صافي '+dur(worked(r,key));col='var(--gold)'}
-  const ph=document.getElementById('phase');ph.style.color=col;ph.innerHTML=`<span class="dot"></span><span>${txt}</span>`;
-  if(full){
-    const A=off?{f:null}:allowed(r,n),all=!nf0;
-    document.getElementById('nextLbl').textContent=off?'لا يوجد دوام اليوم':all?'اكتمل تسجيل اليوم':A.f?ACT[A.f]:A.msg;
-    document.getElementById('hint').textContent=off?'':all?'تم تسجيل البصمات الأربع':A.f?ACT[A.f]+' متاح حتى '+tm(W[A.f][1]):A.sub;
-    ['bFace','bFp'].forEach(id=>document.getElementById(id).disabled=!A.f);
-    const sc=document.getElementById('scan');if(!busy)sc.classList.toggle('locked',!A.f);
-    document.getElementById('slots').innerHTML=FIELDS.map(f=>{
-      const v=r&&r[f]!=null;const late=v&&((f==='in'&&r.in>S.in+S.grace)||(f==='in2'&&r.in2>S.b2+S.grace));
-      const missed=!v&&!off&&n>W[f][1];
-      const m=v&&r.m&&r.m[f]?MI[r.m[f]]:null;
-      const cls=v?(late?'late':'done'):missed?'missed':(f===A.f?'next':'');
-      return `<div class="slot ${cls}" data-slot="${f}"><div class="l">${FL[f]}</div><div class="v num">${v?tm(r[f]):missed?'فات':'—'}</div><div class="m">${m?ic(m[0],11)+m[1]:v?'':'من '+tm(W[f][0])}</div></div>`}).join('');
-  }
-  const wtEl=document.getElementById('wt');
-  if(wtEl){let s=worked(r,key)*60;s=Math.max(0,Math.floor(s));wtEl.textContent=nf2.format(Math.floor(s/3600))+':'+nf2.format(Math.floor(s%3600/60))+':'+nf2.format(s%60)}
-}
-function bindScan(){
-  const bFace=document.getElementById('bFace'),bFp=document.getElementById('bFp'),cam=document.getElementById('cam');
-  bFace.onclick=()=>{if(busy)return;const A=allowed(todayRec(empById(store.sel)),nowMin());if(!A.f){runFail(A.msg);updateEmpLive(true);return}cam.value='';cam.click()};
-  cam.onchange=async()=>{
-    const f=cam.files&&cam.files[0];if(!f)return;
-    let thumb=null;
-    try{
-      const url=URL.createObjectURL(f);const img=new Image();img.src=url;await img.decode();
-      const c=document.createElement('canvas'),s=160;c.width=c.height=s;const x=c.getContext('2d');
-      const k=Math.max(s/img.width,s/img.height),w=img.width*k,h=img.height*k;x.drawImage(img,(s-w)/2,(s-h)/2,w,h);
-      thumb=c.toDataURL('image/jpeg',.72);URL.revokeObjectURL(url);
-    }catch(e){runFail('تعذّر قراءة الصورة، حاول مرة أخرى');return}
-    document.getElementById('core').innerHTML=`<img src="${thumb}" alt="">`;
-    runScan('face',2200,thumb);
-  };
-  let hold=null;
-  const start=e=>{if(window.__bio||busy||bFp.disabled)return;e.preventDefault();bFp.classList.add('holding');vibrate(15);
-    document.getElementById('hint').textContent='استمر في الضغط…';
-    const scan=document.getElementById('scan');scan.classList.add('busy');
-    const t0=performance.now();const prog=document.getElementById('prog');
-    (function f(t){if(!bFp.classList.contains('holding'))return;const k=Math.min((t-t0)/1200,1);prog.style.strokeDashoffset=100-k*100;if(k<1)hold=requestAnimationFrame(f);else{bFp.classList.remove('holding');success('finger',null)}})(t0);
-  };
-  const stop=()=>{if(!bFp.classList.contains('holding'))return;bFp.classList.remove('holding');cancelAnimationFrame(hold);runFail('ارفع إصبعك بعد اكتمال الدائرة')};
-  bFp.onclick=async()=>{
-    if(!window.__bio||busy||bFp.disabled)return;
-    const A=allowed(todayRec(empById(store.sel)),nowMin());if(!A.f){runFail(A.msg);return}
-    busy=true;document.getElementById('scan').classList.add('busy');
-    document.getElementById('hint').textContent='ضع إصبعك على حساس الجوال أو استخدم Face ID…';
-    const ok=await bioVerify(empById(store.sel));busy=false;
-    if(ok)runScan('finger',600,null);else{document.getElementById('scan').classList.remove('busy');runFail('لم يتم التحقق من البصمة')}
-  };
-  bFp.addEventListener('pointerdown',start);
-  ['pointerup','pointerleave','pointercancel'].forEach(t=>bFp.addEventListener(t,stop));
-  bFp.addEventListener('keydown',e=>{if(window.__bio)return;if((e.key==='Enter'||e.key===' ')&&!e.repeat){busy||runScan('finger',1200,null)}});
-}
-function runScan(method,ms,thumb){
-  busy=true;const scan=document.getElementById('scan'),prog=document.getElementById('prog');
-  scan.classList.remove('ok','fail');scan.classList.add('busy');
-  document.getElementById('hint').textContent=method==='face'?'جارٍ التحقق من الوجه…':'جارٍ قراءة البصمة…';
-  const t0=performance.now();
-  (function f(t){const k=Math.min((t-t0)/ms,1);prog.style.strokeDashoffset=100-k*100;if(k<1)requestAnimationFrame(f);else success(method,thumb)})(t0);
-}
-function runFail(msg){
-  const scan=document.getElementById('scan');scan.classList.remove('busy');scan.classList.add('fail');vibrate([60,40,60]);
-  document.getElementById('hint').textContent=msg;
-  setTimeout(()=>{scan.classList.remove('fail');document.getElementById('prog').style.strokeDashoffset=100;busy=false},700);
-}
-function success(method,thumb){
-  const emp=empById(store.sel),key=keyOf(today0());
-  const base=getRec(emp,key);const r=base?JSON.parse(JSON.stringify(base)):{};r.m=r.m||{};
-  const A=allowed(base,nowMin());
-  if(!A.f){const sc=document.getElementById('scan');sc.classList.remove('busy');busy=false;runFail(A.msg);setTimeout(()=>updateEmpLive(true),750);return}
-  const f=A.f;
-  const n=Math.floor(nowMin());r[f]=n;r.m[f]=method;if(thumb)r.selfie=thumb;
-  (store.rec[emp.id]=store.rec[emp.id]||{})[key]=r;save();
-  const scan=document.getElementById('scan');scan.classList.remove('busy');scan.classList.add('ok');vibrate([30,50,90]);
-  const late=(f==='in'&&n>S.in+S.grace)||(f==='in2'&&n>S.b2+S.grace);
-  const early=f==='out'&&n<S.out;
-  document.getElementById('hint').textContent=`تم ${FL[f]} ${tm(n)}`+(late?' · تأخير '+dur(n-(f==='in'?S.in:S.b2)):'')+(early?' · انصراف مبكر':'');
-  pushEvent({emp:emp.id,f,t:n,method,late,early});
-  toast(late?'warn':'ok',`${emp.name} · ${FL[f]} ${tm(n)}`,`تم التحقق ب${MI[method][1]}`+(late?' · متأخر':''),'إشعار للمالك');
-  setTimeout(()=>{
-    scan.classList.remove('ok');document.getElementById('prog').style.strokeDashoffset=100;
-    document.getElementById('core').innerHTML=`<span class="face">${ic('face',70,1.2)}</span>`;
-    busy=false;updateEmpLive(true);
-    const sl=document.querySelector(`[data-slot="${f}"]`);sl&&sl.classList.add('flash');
-    const pr=document.getElementById('myProf');pr&&pr._refresh&&pr._refresh();
-  },1700);
-}
-
-/* ===== owner view ===== */
-function ownerEvents(){
-  const key=keyOf(today0()),n=nowMin(),list=[];
-  emps().forEach(e=>{
-    const r=getRec(e,key);
-    const ov=store.rec[e.id]&&store.rec[e.id][key];
-    if(r&&!ov)FIELDS.forEach(f=>{if(r[f]!=null){const late=(f==='in'&&r.in>S.in+S.grace)||(f==='in2'&&r.in2>S.b2+S.grace);list.push({emp:e.id,f,t:r[f],method:r.m&&r.m[f],late,gen:true})}});
-    if(fromKey(key).getDay()!==5&&(!r||r.in==null)&&n>S.in+S.grace)list.push({emp:e.id,miss:'in',t:S.in+S.grace,gen:true});
-    if(r&&r.out1!=null&&r.in2==null&&n>S.b2+S.grace)list.push({emp:e.id,miss:'in2',t:S.b2+S.grace,gen:true});
-  });
-  store.events.filter(x=>x.day===key).forEach(x=>list.push(x));
-  return list.sort((a,b)=>(b.t-a.t)||((b.at||0)-(a.at||0)));
-}
-function evHTML(x,isNew){
-  const e=empById(x.emp);
-  if(x.demo)return `<div class="ev${isNew?' new':''}"><div class="ico i-${x.kind}">${ic(x.icon,16)}</div><div class="tx">${esc(x.title)}<small>${tm(x.t)} · ${esc(x.sub)}</small></div></div>`;
-  if(x.miss)return `<div class="ev${isNew?' new':''}"><div class="ico i-bad">${ic('alert',16)}</div><div class="tx">${esc(e.name)} ${x.miss==='in'?'لم يسجّل حضور':'لم يعد من البريك'}<small>${tm(x.t)} · تم إرسال تذكيرين للموظف</small></div></div>`;
-  const kind=x.late?'warn':x.f==='out1'||x.f==='in2'?'info':x.f==='out'?'gold':'ok';
-  const icon=x.f==='in'?'login':x.f==='out'?'logout':'coffee';
-  const m=x.method?MI[x.method][1]:'';
-  return `<div class="ev${isNew?' new':''}"><div class="ico i-${kind}">${ic(icon,16)}</div><div class="tx">${esc(e.name)} · ${FL[x.f]}${x.late?' متأخر':''}${x.early?' مبكر':''}<small>${tm(x.t)}${m?' · بصمة '+m:''}</small></div></div>`;
-}
-function renderFeed(isNew){
-  const el=document.getElementById('feed');if(!el)return;
-  const l=ownerEvents();
-  el.innerHTML=l.length?l.map((x,i)=>evHTML(x,isNew&&i===0)).join(''):'<p class="muted">لا توجد إشعارات اليوم بعد.</p>';
-}
-function renderOwner(){
-  const v=document.getElementById('vOwn');const key=keyOf(today0());
-  const list=emps();const ls=list.map(e=>liveStatus(e));
-  const cnt=s=>ls.filter(x=>s.includes(x)).length;
-  const [ma,mb]=periodRange('month');
-  v.innerHTML=`
-  <div class="okpis reveal">
-   <div class="okpi g"><div class="l">${ic('login',14)}حاضر الآن</div><b class="num" data-c="${cnt(['present','late'])}">٠</b></div>
-   <div class="okpi r"><div class="l">${ic('alert',14)}لم يسجّل</div><b class="num" data-c="${cnt(['missing'])}">٠</b></div>
-   <div class="okpi a"><div class="l">${ic('clock',14)}متأخر</div><b class="num" data-c="${cnt(['late'])}">٠</b></div>
-   <div class="okpi i"><div class="l">${ic('coffee',14)}في البريك</div><b class="num" data-c="${cnt(['break'])}">٠</b></div>
-  </div>
-  <div class="card reveal" style="margin-bottom:16px;animation-delay:.06s"><h2>دوام اليوم <span class="muted small" style="font-family:var(--f-body)">${ar(list.length)} موظفين</span></h2>${bandHTML()}</div>
-  <div class="grid two">
-   <section class="card reveal" style="animation-delay:.1s">
-    <h2>الموظفون <span class="muted small" style="font-family:var(--f-body)">التزام الشهر</span></h2>
-    <div id="empList">${list.map((e,i)=>{
-      const s=ls[i],r=getRec(e,key),o=stats(e,ma,mb);
-      const line=r&&r.in!=null?FIELDS.filter(f=>r[f]!=null).map(f=>FL[f]+' '+tm(r[f])).join(' · '):(s==='off'?'إجازة أسبوعية':'لا توجد بصمة اليوم');
-      return `<button class="emp" data-emp="${e.id}"><div class="av">${esc(initials(e.name))}</div><div class="info"><b>${esc(e.name)}</b><span>${line}</span></div><span class="chip c-${s}">${STL[s]}</span><div class="mini"><small class="num">${o.days?ar(o.pct)+'٪':'—'}</small><div class="t"><div data-w="${o.pct}" style="background:${o.pct>=90?'var(--ok)':o.pct>=75?'var(--warn)':'var(--bad)'}"></div></div></div></button>`}).join('')}</div>
-    <form class="form" id="addForm" style="margin-top:14px" novalidate>
-     <input id="newName" placeholder="اسم الموظف الجديد" autocomplete="off" aria-label="اسم الموظف الجديد">
-     <button class="btn ghost" type="submit" style="flex:0 0 auto">${ic('userplus',16)} إضافة</button>
-     <div class="err" id="addErr"></div>
-    </form>
-   </section>
-   <section class="card reveal" style="animation-delay:.16s">
-    <h2>الإشعارات <span style="color:var(--gold)">${ic('bell',18)}</span></h2>
-    <div class="feed" id="feed"></div>
-    <div class="row-btns"><button class="btn ghost" id="demoAlerts">${ic('play',14)} عرض تسلسل التنبيهات</button></div>
-   </section>
-  </div>
-  <section class="card reveal" style="margin-top:16px;animation-delay:.2s">
-   <h2>إعدادات الدوام</h2>
-   <div class="rules">
-    <div>الحضور<b>${tm(S.in)}</b></div><div>بداية البريك<b>${tm(S.b1)}</b></div><div>العودة<b>${tm(S.b2)}</b></div><div>الانصراف<b>${tm(S.out)}</b></div>
-    <div>نافذة الحضور<b>${tm(W.in[0])} – ${tm(W.in[1])}</b></div><div>نافذة البريك<b>${tm(W.out1[0])} – ${tm(W.out1[1])}</b></div><div>نافذة العودة<b>${tm(W.in2[0])} – ${tm(W.in2[1])}</b></div><div>نافذة الانصراف<b>${tm(W.out[0])} – ${tm(W.out[1])}</b></div>
-    <div>فترة السماح<b>${ar(S.grace)} دقيقة</b></div><div>تذكير الموظف<b>بعد ${ar(5)} و${ar(10)} د</b></div><div>إشعار المالك<b>بعد ${ar(15)} د</b></div><div>الإجازة الأسبوعية<b>الجمعة</b></div>
-   </div>
-  </section>`;
-  v.querySelectorAll('[data-c]').forEach(b=>countTo(b,+b.dataset.c));
-  requestAnimationFrame(()=>requestAnimationFrame(()=>v.querySelectorAll('[data-w]').forEach(d=>d.style.transform=`scaleX(${d.dataset.w/100})`)));
-  renderFeed(false);updateBands();
-  v.querySelector('#empList').onclick=e=>{const b=e.target.closest('[data-emp]');if(b)openSheet(empById(b.dataset.emp))};
-  const nm=v.querySelector('#newName'),er=v.querySelector('#addErr');
-  nm.oninput=()=>er.textContent='';
-  v.querySelector('#addForm').onsubmit=e=>{e.preventDefault();const name=nm.value.trim();
-    if(name.length<2){er.textContent='اكتب اسم الموظف أولاً';return}
-    if(emps().some(x=>x.name===name)){er.textContent='هذا الاسم موجود بالفعل';return}
-    store.emps.push({id:'u'+Date.now(),name,start:keyOf(today0()),abs:0,late:0,added:true});save();
-    toast('ok','تمت إضافة '+name,'يظهر الآن في قائمة "تسجيل الدخول كـ"','الإدارة');renderOwner()};
-  v.querySelector('#demoAlerts').onclick=demoSequence;
-}
-function demoSequence(){
-  const btn=document.getElementById('demoAlerts');if(btn)btn.disabled=true;
-  const seq=[
-   {d:0,kind:'warn',icon:'finger',title:'لم تسجّل حضورك بعد',sub:'تذكير للموظف · خالد عمر',t:S.in+5,body:'الدوام بدأ '+tm(S.in)+' · سجّل الآن قبل احتساب التأخير',who:'تنبيه للموظف'},
-   {d:1700,kind:'bad',icon:'alert',title:'تذكير أخير',sub:'تذكير للموظف · خالد عمر',t:S.in+10,body:'باقي ٥ دقائق على نهاية فترة السماح',who:'تنبيه للموظف'},
-   {d:3400,kind:'bad',icon:'alert',title:'خالد عمر لم يسجّل حضور',sub:'إشعار للمالك بعد تذكيرين',t:S.in+15,body:'لم يستجب لتذكيرين',who:'إشعار للمالك'}
-  ];
-  seq.forEach(s=>setTimeout(()=>{toast(s.kind,s.title,s.body,s.who);
-    const feed=document.getElementById('feed');if(feed){const tmp=document.createElement('div');tmp.innerHTML=evHTML({demo:true,...s},true);feed.prepend(tmp.firstChild)}
-  },s.d));
-  setTimeout(()=>{if(btn)btn.disabled=false},4200);
-}
-
-/* sheet */
-function openSheet(emp){
-  const sh=document.getElementById('sheet'),sc=document.getElementById('scrim'),inner=document.getElementById('sheetInner');
-  const r=getRec(emp,keyOf(today0()));
-  inner.innerHTML=`<div class="sh-head"><div class="av">${r&&r.selfie?`<img src="${r.selfie}" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`:esc(initials(emp.name))}</div><b>${esc(emp.name)}</b>
-    <button class="navb" id="shClose" aria-label="إغلاق">${ic('x',16)}</button></div>
-    ${r&&r.selfie?'<p class="muted small" style="margin:-6px 0 12px">صورة التحقق من آخر بصمة وجه اليوم</p>':''}
-    <div class="card" style="padding:16px"><div id="shProf"></div></div>`;
-  sh.hidden=false;sc.hidden=false;
-  requestAnimationFrame(()=>{sh.classList.add('on');sc.classList.add('on')});
-  mountProfile(document.getElementById('shProf'),emp);
-  document.getElementById('shClose').onclick=closeSheet;sc.onclick=closeSheet;
-  document.getElementById('shClose').focus();
-}
-function closeSheet(){
-  const sh=document.getElementById('sheet'),sc=document.getElementById('scrim');
-  sh.classList.remove('on');sc.classList.remove('on');setTimeout(()=>{sh.hidden=true;sc.hidden=true},450);
-}
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!document.getElementById('sheet').hidden)closeSheet()});
-
-/* role switch */
-function setRole(r){
-  role=r;const seg=document.getElementById('roleSeg');
-  document.getElementById('r-emp').setAttribute('aria-pressed',r==='emp');document.getElementById('r-own').setAttribute('aria-pressed',r==='own');
-  movePill(seg);
-  const ve=document.getElementById('vEmp'),vo=document.getElementById('vOwn');
-  ve.hidden=r!=='emp';vo.hidden=r!=='own';
-  if(r==='emp')renderEmp();else renderOwner();
-}
-document.getElementById('r-emp').onclick=()=>setRole('emp');
-document.getElementById('r-own').onclick=()=>setRole('own');
-addEventListener('resize',()=>document.querySelectorAll('.seg,.tabs').forEach(movePill));
-
-/* reminder engine (live, for the selected employee) */
-const fired=new Set();
-function checkReminders(){
-  const key=keyOf(today0());if(fromKey(key).getDay()===5)return;
-  const n=nowMin(),emp=empById(store.sel),r=todayRec(emp);
-  const rule=(id,cond,fn)=>{const k=key+emp.id+id;if(cond&&!fired.has(k)){fired.add(k);fn()}};
-  const noIn=!r||r.in==null,noBack=r&&r.out1!=null&&r.in2==null;
-  rule('in5',noIn&&n>=S.in+5&&n<S.in+10,()=>toast('warn','لم تسجّل حضورك بعد','الدوام بدأ '+tm(S.in)+' · سجّل الآن قبل احتساب التأخير','تنبيه لك'));
-  rule('in10',noIn&&n>=S.in+10&&n<S.in+15,()=>toast('bad','تذكير أخير','باقي ٥ دقائق على نهاية فترة السماح','تنبيه لك'));
-  rule('b-5',r&&r.out1!=null&&noBack&&n>=S.b2-5&&n<S.b2,()=>toast('info','العودة من البريك بعد ٥ دقائق','لا تنسَ تسجيل بصمة العودة','تنبيه لك'));
-  rule('b5',noBack&&n>=S.b2+5&&n<S.b2+15,()=>toast('warn','لم تسجّل عودتك من البريك','سجّل الآن قبل احتساب التأخير','تنبيه لك'));
-}
-
-/* device biometrics (WebAuthn) */
-const b64=b=>btoa(String.fromCharCode(...new Uint8Array(b)));
-const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
-async function bioVerify(emp){
-  try{
-    store.cred=store.cred||{};const ch=crypto.getRandomValues(new Uint8Array(32));
-    if(!store.cred[emp.id]){
-      const c=await navigator.credentials.create({publicKey:{challenge:ch,rp:{name:'أساس العارض'},
-        user:{id:new TextEncoder().encode(emp.id),name:emp.id,displayName:emp.name},
-        pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
-        authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',residentKey:'discouraged'},timeout:60000}});
-      store.cred[emp.id]=b64(c.rawId);save();toast('ok','تم ربط بصمتك بهذا الجهاز','البصمة القادمة ستُطابق عليها','الأمان');return true;
-    }
-    await navigator.credentials.get({publicKey:{challenge:ch,allowCredentials:[{type:'public-key',id:unb64(store.cred[emp.id])}],userVerification:'required',timeout:60000}});
-    return true;
-  }catch(e){return false}
-}
-(async()=>{try{if(window.PublicKeyCredential&&await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()){window.__bio=true;if(role==='emp'&&!busy)renderEmp()}}catch(e){}})();
-if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
-
-/* boot */
-setDates();tickClock();
-setInterval(()=>{tickClock();if(role==='emp')updateEmpLive(false)},1000);
-setInterval(()=>{updateBands();checkReminders();if(role==='emp'&&!busy)updateEmpLive(true)},20000);
-renderEmp();movePill(document.getElementById('roleSeg'));
-if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>document.querySelectorAll('.seg,.tabs').forEach(movePill));
-setTimeout(()=>{const s=document.getElementById('splash');s.classList.add('out');setTimeout(()=>s.remove(),700);checkReminders()},RM?200:2700);
-</script>
-
+<script type="module" src="app.js"></script>
 </body>
 </html>
