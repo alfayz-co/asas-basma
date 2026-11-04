@@ -1,11 +1,14 @@
 import { firebaseConfig, OWNER_UID, EMAIL_DOMAIN } from './config.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, updatePassword } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getAuth, initializeAuth, indexedDBLocalPersistence, browserLocalPersistence, browserSessionPersistence, setPersistence, onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, updatePassword } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, doc, setDoc, updateDoc, onSnapshot, collection, query, where, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 /* ========== Firebase ========== */
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+// الجلسة تفضل محفوظة على الجهاز (تذكرني) لحد ما المستخدم يسجّل خروج
+let auth;
+try { auth = initializeAuth(app, { persistence: [indexedDBLocalPersistence, browserLocalPersistence] }); }
+catch (e) { auth = getAuth(app); }
 let db;
 try { db = initializeFirestore(app, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) }); }
 catch (e) { db = initializeFirestore(app, {}); }
@@ -199,28 +202,45 @@ function show(id) {
 /* ----- login ----- */
 function renderLogin() {
   show('vLogin');
-  const f = $('loginForm'), u = $('lgUser'), p = $('lgPass'), er = $('lgErr'), b = $('lgBtn');
+  const f = $('loginForm'), u = $('lgUser'), p = $('lgPass'), er = $('lgErr'), b = $('lgBtn'), rm = $('lgRemember');
   u.oninput = p.oninput = () => er.textContent = '';
+  try { rm.checked = localStorage.getItem('basma-remember') !== '0'; if (rm.checked && !u.value) u.value = localStorage.getItem('basma-user') || ''; } catch (e) { }
   f.onsubmit = async e => {
     e.preventDefault();
     const user = u.value.trim(), pass = p.value;
-    if (!user) { er.textContent = 'اكتب رقمك الوظيفي أو إيميلك'; u.focus(); return; }
+    if (!user) { er.textContent = 'اكتب اسم المستخدم أو إيميلك'; u.focus(); return; }
     if (!pass) { er.textContent = 'اكتب كلمة السر'; p.focus(); return; }
     const email = user.includes('@') ? user : toEmail(user);
     b.disabled = true; b.textContent = 'جارٍ الدخول…';
-    try { await signInWithEmailAndPassword(auth, email, pass); p.value = ''; }
+    try {
+      try { await setPersistence(auth, rm.checked ? indexedDBLocalPersistence : browserSessionPersistence); } catch (e) { }
+      await signInWithEmailAndPassword(auth, email, pass); p.value = '';
+      try { localStorage.setItem('basma-remember', rm.checked ? '1' : '0'); if (rm.checked) localStorage.setItem('basma-user', user); else localStorage.removeItem('basma-user'); } catch (e) { }
+    }
     catch (err) { er.textContent = authMsg(err); }
     finally { b.disabled = false; b.textContent = 'دخول'; }
   };
 }
-const toEmail = num => String(num).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/\s+/g, '').toLowerCase() + '@' + EMAIL_DOMAIN;
+/* اسم المستخدم: حروف عربي أو إنجليزي وأرقام. يتحوّل لإيميل داخلي ثابت
+   - إنجليزي وأرقام فقط: يفضل زي ما هو (الحسابات القديمة بالرقم الوظيفي شغالة زي ما هي)
+   - فيه عربي: يتحوّل بـ Punycode لحروف إنجليزية */
+const normUser = s => String(s ?? '').replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
+  .replace(/[\u064B-\u0652\u0640]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه')
+  .replace(/[\s_.\-]+/g, '').toLowerCase();
+const USER_OK = /^[a-z0-9\u0621-\u064A]{2,24}$/;
+function toEmail(user) {
+  const n = normUser(user);
+  if (/^[a-z0-9]+$/.test(n)) return n + '@' + EMAIL_DOMAIN;
+  let host = n; try { host = new URL('http://' + n + '.x').hostname.slice(0, -2); } catch (e) { }
+  return 'u.' + host.replace(/^xn--/, '') + '@' + EMAIL_DOMAIN;
+}
 function authMsg(e) {
   const c = e && e.code || '';
-  if (c.includes('invalid-credential') || c.includes('wrong-password') || c.includes('user-not-found') || c.includes('invalid-email')) return 'الرقم أو كلمة السر غير صحيحة';
+  if (c.includes('invalid-credential') || c.includes('wrong-password') || c.includes('user-not-found') || c.includes('invalid-email')) return 'اسم المستخدم أو كلمة السر غير صحيحة';
   if (c.includes('too-many-requests')) return 'محاولات كثيرة، انتظر دقائق ثم حاول مرة أخرى';
   if (c.includes('network')) return 'لا يوجد اتصال بالإنترنت';
   if (c.includes('weak-password')) return 'كلمة السر لازم تكون ٦ حروف أو أرقام على الأقل';
-  if (c.includes('email-already-in-use')) return 'هذا الرقم الوظيفي مستخدم بالفعل';
+  if (c.includes('email-already-in-use')) return 'اسم المستخدم مستخدم بالفعل';
   if (c.includes('requires-recent-login')) return 'سجّل خروج وادخل مرة أخرى ثم غيّر كلمة السر';
   return 'حدث خطأ، حاول مرة أخرى';
 }
@@ -584,10 +604,10 @@ function renderOwner() {
       const line = !e.active ? 'الحساب موقوف' : r ? FIELDS.filter(f => r[f] != null).map(f => FL[f] + ' ' + tm(r[f])).join(' · ') : (s === 'off' ? 'إجازة أسبوعية' : 'لا توجد بصمة اليوم');
       const av = r && FIELDS.map(f => r.ph[f]).filter(Boolean).pop();
       return `<button class="emp" data-emp="${e.id}"><div class="av">${av ? `<img src="${av}" alt="">` : esc(initials(e.name))}</div><div class="info"><b>${esc(e.name)} <span class="muted small">#${esc(e.num)}</span></b><span>${line}</span></div><span class="chip c-${s}">${STL[s]}</span><div class="mini"><small class="num">${o.days ? ar(o.pct) + '٪' : '—'}</small><div class="t"><div data-w="${o.pct}" style="background:${o.pct >= 90 ? 'var(--ok)' : o.pct >= 75 ? 'var(--warn)' : 'var(--bad)'}"></div></div></div></button>`;
-    }).join('') : `<div class="empty">${ic('userplus', 28, 1.4)}<b>أضف أول موظف</b><span>اكتب الاسم والرقم الوظيفي وكلمة سر مؤقتة، وابعتها للموظف مع رابط التطبيق.</span></div>`}</div>
+    }).join('') : `<div class="empty">${ic('userplus', 28, 1.4)}<b>أضف أول موظف</b><span>اكتب الاسم واسم المستخدم وكلمة سر مؤقتة، وابعتها للموظف مع رابط التطبيق.</span></div>`}</div>
     <form class="form addform" id="addForm" novalidate>
      <div class="fl"><label for="nName">اسم الموظف</label><input id="nName" autocomplete="off" placeholder="أحمد محمد"></div>
-     <div class="fl"><label for="nNum">الرقم الوظيفي</label><input id="nNum" autocomplete="off" inputmode="numeric" placeholder="1001"></div>
+     <div class="fl"><label for="nNum">اسم المستخدم (حروف وأرقام)</label><input id="nNum" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="ahmed1 أو أحمد1"></div>
      <div class="fl"><label for="nPass">كلمة سر مؤقتة</label><input id="nPass" autocomplete="new-password" placeholder="٦ أرقام على الأقل"></div>
      <button class="btn primary" type="submit" id="addBtn">${ic('userplus', 16)} إضافة موظف</button>
      <div class="err" id="addErr"></div>
@@ -629,10 +649,10 @@ function bindAdd() {
   [n, u, p].forEach(x => x.oninput = () => er.textContent = '');
   $('addForm').onsubmit = async e => {
     e.preventDefault();
-    const name = n.value.trim(), num = u.value.trim().replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)), pass = p.value;
+    const name = n.value.trim(), num = u.value.trim().replace(/\s+/g, ' ').replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)), pass = p.value;
     if (name.length < 2) { er.textContent = 'اكتب اسم الموظف'; n.focus(); return; }
-    if (!/^[A-Za-z0-9]{2,20}$/.test(num)) { er.textContent = 'الرقم الوظيفي أرقام أو حروف إنجليزية فقط'; u.focus(); return; }
-    if (emps.some(x => String(x.num) === num)) { er.textContent = 'هذا الرقم الوظيفي مستخدم بالفعل'; u.focus(); return; }
+    if (!USER_OK.test(normUser(num))) { er.textContent = 'اسم المستخدم من ٢ لـ ٢٤ حرف: حروف عربي أو إنجليزي وأرقام فقط'; u.focus(); return; }
+    if (emps.some(x => normUser(x.num) === normUser(num))) { er.textContent = 'اسم المستخدم مستخدم بالفعل'; u.focus(); return; }
     if (pass.length < 6) { er.textContent = 'كلمة السر المؤقتة ٦ حروف أو أرقام على الأقل'; p.focus(); return; }
     btn.disabled = true; btn.textContent = 'جارٍ الإضافة…';
     try {
@@ -640,7 +660,7 @@ function bindAdd() {
       const cred = await createUserWithEmailAndPassword(sec.auth, toEmail(num), pass);
       await setDoc(doc(db, 'employees', cred.user.uid), { name, num, active: true, mustChange: true, cred: null, createdAt: serverTimestamp(), start: todayKey() });
       await signOut(sec.auth);
-      toast('ok', 'تمت إضافة ' + name, 'يدخل بالرقم ' + num + ' وكلمة السر المؤقتة', 'الإدارة');
+      toast('ok', 'تمت إضافة ' + name, 'يدخل باسم المستخدم «' + num + '» وكلمة السر المؤقتة', 'الإدارة');
       n.value = u.value = p.value = '';
     } catch (err) { er.textContent = authMsg(err); }
     finally { btn.disabled = false; btn.innerHTML = `${ic('userplus', 16)} إضافة موظف`; }
@@ -769,7 +789,7 @@ addEventListener('resize', () => document.querySelectorAll('.tabs').forEach(move
 /* ========== light / dark ========== */
 const SUN = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12a4 4 0 1 0 8 0a4 4 0 1 0-8 0M3 12h1M12 3v1M20 12h1M12 20v1M5.6 5.6l.7.7M18.4 5.6l-.7.7M17.7 17.7l.7.7M6.3 17.7l-.7.7"/></svg>';
 const MOON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3h.39a7.5 7.5 0 0 0 7.92 12.45A9 9 0 1 1 12 3z"/></svg>';
-const curTheme = () => document.documentElement.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+const curTheme = () => document.documentElement.getAttribute('data-theme') || 'light';
 function paintThemeBtns() {
   const t = curTheme();
   document.querySelectorAll('[data-theme-toggle]').forEach(b => { b.innerHTML = t === 'dark' ? SUN : MOON; b.setAttribute('aria-label', t === 'dark' ? 'التحويل للوضع الأبيض' : 'التحويل للوضع الأسود'); });
@@ -779,7 +799,7 @@ document.addEventListener('click', e => {
   const b = e.target.closest('[data-theme-toggle]'); if (!b) return;
   const next = curTheme() === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
-  try { localStorage.setItem('basma-theme', next); } catch (err) { }
+  try { localStorage.setItem('basma-theme2', next); } catch (err) { }
   paintThemeBtns(); vibrate(15);
 });
 paintThemeBtns();

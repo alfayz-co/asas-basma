@@ -1,4 +1,4 @@
-const CACHE = 'asas-basma-v6';
+const CACHE = 'asas-basma-v7';
 const SHELL = [
   './',
   './index.html',
